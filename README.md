@@ -351,7 +351,7 @@ The **README** provides the high-level overview of the complete SQL + Power BI p
 
 ## Executive Dashboard
 
-*Add Executive Dashboard screenshot here.*
+(https://github.com/Jubbic/olist-ecommerce-customer-analysis/blob/main/Screenshots/customer_insights.png)
 
 ## Customer Insights Dashboard
 
