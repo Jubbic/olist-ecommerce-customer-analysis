@@ -1,0 +1,442 @@
+# Olist E-Commerce Data Dictionary
+
+## Overview
+
+This data dictionary documents the main tables used in the **Olist E-Commerce Customer Analytics** project.
+
+The dataset is based on the **Brazilian E-Commerce Public Dataset by Olist** and contains customer, order, product, seller, payment, review, and geographic information.
+
+The dictionary is intended to support the SQL analysis and Power BI data model by describing the purpose of each table, its key fields, and the relationships between entities.
+
+---
+
+# 1. `olist_customers_dataset`
+
+Contains customer information associated with Olist orders.
+
+| Column                     | Description                                                        |
+| -------------------------- | ------------------------------------------------------------------ |
+| `customer_id`              | Unique identifier assigned to a customer record/order relationship |
+| `customer_unique_id`       | Unique identifier representing the actual customer across orders   |
+| `customer_zip_code_prefix` | First five digits of the customer's ZIP/postal code                |
+| `customer_city`            | Customer city                                                      |
+| `customer_state`           | Customer state                                                     |
+
+### Primary Key
+
+`customer_id`
+
+### Important Relationship
+
+`customer_id` → `olist_orders_dataset.customer_id`
+
+`customer_unique_id` is used for customer-level analysis such as identifying repeat customers.
+
+---
+
+# 2. `olist_orders_dataset`
+
+Contains information about customer orders and their lifecycle.
+
+| Column                          | Description                                                |
+| ------------------------------- | ---------------------------------------------------------- |
+| `order_id`                      | Unique identifier for an order                             |
+| `customer_id`                   | Identifier of the customer who placed the order            |
+| `order_status`                  | Current/final status of the order                          |
+| `order_purchase_timestamp`      | Date and time when the order was placed                    |
+| `order_approved_at`             | Date and time when payment was approved                    |
+| `order_delivered_carrier_date`  | Date and time when the order was handed to the carrier     |
+| `order_delivered_customer_date` | Date and time when the order was delivered to the customer |
+| `order_estimated_delivery_date` | Estimated delivery date                                    |
+
+### Primary Key
+
+`order_id`
+
+### Important Relationship
+
+`customer_id` → `olist_customers_dataset.customer_id`
+
+`order_id` → `olist_order_items_dataset.order_id`
+
+`order_id` → `olist_order_payments_dataset.order_id`
+
+`order_id` → `olist_order_reviews_dataset.order_id`
+
+---
+
+# 3. `olist_order_items_dataset`
+
+Contains individual products included in each order.
+
+| Column                | Description                                       |
+| --------------------- | ------------------------------------------------- |
+| `order_id`            | Identifier of the order                           |
+| `order_item_id`       | Sequential item number within an order            |
+| `product_id`          | Identifier of the purchased product               |
+| `seller_id`           | Identifier of the seller responsible for the item |
+| `shipping_limit_date` | Seller shipping deadline                          |
+| `price`               | Price of the product item                         |
+| `freight_value`       | Freight/shipping cost associated with the item    |
+
+### Composite Key
+
+`order_id + order_item_id`
+
+### Important Relationships
+
+`order_id` → `olist_orders_dataset.order_id`
+
+`product_id` → `olist_products_dataset.product_id`
+
+`seller_id` → `olist_sellers_dataset.seller_id`
+
+### Analytical Use
+
+This table is the primary source for **Product Revenue** and **Units Sold** analysis.
+
+---
+
+# 4. `olist_order_payments_dataset`
+
+Contains payment information for orders.
+
+| Column                 | Description                                           |
+| ---------------------- | ----------------------------------------------------- |
+| `order_id`             | Identifier of the associated order                    |
+| `payment_sequential`   | Sequence number for payments associated with an order |
+| `payment_type`         | Payment method used                                   |
+| `payment_installments` | Number of installments                                |
+| `payment_value`        | Payment amount                                        |
+
+### Composite Key
+
+`order_id + payment_sequential`
+
+### Important Relationship
+
+`order_id` → `olist_orders_dataset.order_id`
+
+### Analytical Use
+
+Used for:
+
+* Total payment value
+* Payment method analysis
+* Installment analysis
+* Payment distribution
+
+---
+
+# 5. `olist_order_reviews_dataset`
+
+Contains customer review information.
+
+| Column                    | Description                           |
+| ------------------------- | ------------------------------------- |
+| `review_id`               | Identifier for a review               |
+| `order_id`                | Identifier of the reviewed order      |
+| `review_score`            | Customer review score from 1 to 5     |
+| `review_comment_title`    | Review comment title                  |
+| `review_comment_message`  | Review comment text                   |
+| `review_creation_date`    | Date the review was created           |
+| `review_answer_timestamp` | Date and time the review was answered |
+
+### Relationship
+
+`order_id` → `olist_orders_dataset.order_id`
+
+### Analytical Use
+
+Used for:
+
+* Average review score
+* Customer satisfaction analysis
+* Review performance
+
+---
+
+# 6. `olist_products_dataset`
+
+Contains product-level information.
+
+| Column                       | Description                                     |
+| ---------------------------- | ----------------------------------------------- |
+| `product_id`                 | Unique identifier for a product                 |
+| `product_category_name`      | Product category name in the original dataset   |
+| `product_name_lenght`        | Number of characters in the product name        |
+| `product_description_lenght` | Number of characters in the product description |
+| `product_photos_qty`         | Number of product photos                        |
+| `product_weight_g`           | Product weight in grams                         |
+| `product_length_cm`          | Product length in centimeters                   |
+| `product_height_cm`          | Product height in centimeters                   |
+| `product_width_cm`           | Product width in centimeters                    |
+
+### Primary Key
+
+`product_id`
+
+### Important Relationship
+
+`product_id` → `olist_order_items_dataset.product_id`
+
+### Analytical Use
+
+Used for product and category performance analysis.
+
+---
+
+# 7. `olist_sellers_dataset`
+
+Contains seller information.
+
+| Column                   | Description                                     |
+| ------------------------ | ----------------------------------------------- |
+| `seller_id`              | Unique identifier for a seller                  |
+| `seller_zip_code_prefix` | First five digits of the seller ZIP/postal code |
+| `seller_city`            | Seller city                                     |
+| `seller_state`           | Seller state                                    |
+
+### Primary Key
+
+`seller_id`
+
+### Important Relationship
+
+`seller_id` → `olist_order_items_dataset.seller_id`
+
+### Analytical Use
+
+Used for:
+
+* Seller performance
+* Seller city analysis
+* Seller geographic analysis
+* Seller revenue analysis
+
+---
+
+# 8. `olist_geolocation_dataset`
+
+Contains geographic coordinates and location information associated with ZIP code prefixes.
+
+| Column                        | Description                       |
+| ----------------------------- | --------------------------------- |
+| `geolocation_zip_code_prefix` | Five-digit ZIP/postal code prefix |
+| `geolocation_lat`             | Latitude                          |
+| `geolocation_lng`             | Longitude                         |
+| `geolocation_city`            | City                              |
+| `geolocation_state`           | State                             |
+
+### Analytical Use
+
+Used to support geographic analysis and mapping.
+
+The ZIP code prefix can be associated with customer and seller locations.
+
+---
+
+# 9. `product_category_name_translation`
+
+Contains English translations for product category names.
+
+| Column                          | Description                              |
+| ------------------------------- | ---------------------------------------- |
+| `product_category_name`         | Original Portuguese category name        |
+| `product_category_name_english` | English translation of the category name |
+
+### Relationship
+
+`product_category_name` → `olist_products_dataset.product_category_name`
+
+### Analytical Use
+
+Used to make product category labels more understandable in reports and Power BI dashboards.
+
+---
+
+#  Core Data Relationships
+
+The major relationships in the analytical model can be represented as:
+
+```text
+CUSTOMERS
+   │
+   │ customer_id
+   ▼
+ORDERS
+   │
+   ├──────────────► ORDER_PAYMENTS
+   │
+   ├──────────────► ORDER_REVIEWS
+   │
+   ▼
+ORDER_ITEMS
+   │
+   ├──────────────► PRODUCTS
+   │                    │
+   │                    ▼
+   │              CATEGORY_TRANSLATION
+   │
+   └──────────────► SELLERS
+```
+
+Geographic information is provided separately through:
+
+```text
+CUSTOMER ZIP CODE ──► GEOLOCATION
+SELLER ZIP CODE   ──► GEOLOCATION
+```
+
+---
+
+#  Main Analytical Grain
+
+Understanding the grain of each table is important when writing SQL queries and creating Power BI measures.
+
+| Table                               | Main Grain                                      |
+| ----------------------------------- | ----------------------------------------------- |
+| `olist_customers_dataset`           | Customer/order customer record                  |
+| `olist_orders_dataset`              | One row per order                               |
+| `olist_order_items_dataset`         | One row per product item within an order        |
+| `olist_order_payments_dataset`      | One row per payment transaction within an order |
+| `olist_order_reviews_dataset`       | Review associated with an order                 |
+| `olist_products_dataset`            | One row per product                             |
+| `olist_sellers_dataset`             | One row per seller                              |
+| `olist_geolocation_dataset`         | Geographic record by ZIP prefix/location        |
+| `product_category_name_translation` | One row per translated category                 |
+
+---
+
+#  Important Analytical Fields
+
+## Revenue
+
+`olist_order_items_dataset.price`
+
+Used to calculate **Product Revenue**.
+
+## Freight
+
+`olist_order_items_dataset.freight_value`
+
+Represents shipping/freight charges associated with order items.
+
+## Payment Value
+
+`olist_order_payments_dataset.payment_value`
+
+Used for payment-based revenue/value analysis.
+
+## Units Sold
+
+Each row in `olist_order_items_dataset` represents an order item. Counting relevant item records provides the basis for units-sold analysis.
+
+## Customer Identification
+
+`customer_unique_id` should be used when analyzing customers across multiple orders because `customer_id` is associated with individual order records.
+
+## Order Date
+
+`order_purchase_timestamp` is the primary order-date field used for time-based analysis.
+
+## Product Category
+
+`product_category_name_english` can be used when an English-readable category label is required.
+
+---
+
+#  Key Relationships for Analysis
+
+### Customer Analysis
+
+```text
+customers
+    ↓
+orders
+    ↓
+order_items
+```
+
+Used for customer behavior, order history, revenue per customer, and repeat-customer analysis.
+
+### Product Analysis
+
+```text
+orders
+    ↓
+order_items
+    ↓
+products
+    ↓
+category translation
+```
+
+Used for product revenue, units sold, and category performance.
+
+### Seller Analysis
+
+```text
+orders
+    ↓
+order_items
+    ↓
+sellers
+```
+
+Used for seller revenue and seller-city performance.
+
+### Payment Analysis
+
+```text
+orders
+    ↓
+order_payments
+```
+
+Used for payment method and payment value analysis.
+
+### Review Analysis
+
+```text
+orders
+    ↓
+order_reviews
+```
+
+Used for review score and customer satisfaction analysis.
+
+---
+
+#  Data Modeling Considerations
+
+Several Olist tables have different levels of detail.
+
+For example:
+
+* One order can contain multiple order items.
+* One order can have multiple payment records.
+* An order can be associated with review records.
+* A customer can have multiple orders.
+
+Therefore, joins should be designed carefully to avoid **double-counting revenue, payments, orders, or customers**.
+
+When calculating product-level revenue, the `olist_order_items_dataset` should be used at its natural item-level grain.
+
+When calculating unique customers, `customer_unique_id` should be considered rather than simply counting `customer_id`.
+
+---
+
+#  Purpose of This Data Dictionary
+
+This document serves as a reference for:
+
+* SQL development
+* Database modeling
+* Data validation
+* Power BI modeling
+* DAX measure development
+* Business analysis
+* Future maintenance of the project
+
+It also helps users understand how the Olist datasets connect and which tables should be used for different analytical questions.
