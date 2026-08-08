@@ -351,15 +351,15 @@ The **README** provides the high-level overview of the complete SQL + Power BI p
 
 ## Executive Dashboard
 
-(https://github.com/Jubbic/olist-ecommerce-customer-analysis/blob/main/Screenshots/customer_insights.png)
+https://github.com/Jubbic/olist-ecommerce-customer-analysis/blob/main/Screenshots/customer_insights.png
 
 ## Customer Insights Dashboard
 
-*Add Customer Insights Dashboard screenshot here.*
+https://github.com/Jubbic/olist-ecommerce-customer-analysis/blob/main/Screenshots/executive_dashboard.png
 
 ## Products & Sales Performance Dashboard
 
-*Add Products & Sales Performance Dashboard screenshot here.*
+https://github.com/Jubbic/olist-ecommerce-customer-analysis/blob/main/Screenshots/products_sales_performance.png
 
 ---
 
